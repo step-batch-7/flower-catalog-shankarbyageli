@@ -1,5 +1,10 @@
 Version 1.0:
-  1. Create repository.
-  2. Create the homepage.
-  3. Links to other pages on the home page.
-  4. Create other static pages.
+--done--  1. Create repository. 
+--done--  2. Create the homepage.
+--done--  3. Links to other pages on the home page.
+--done--  4. Create other static pages.
+
+Version 2.0:
+--done-- 1. Create a server to host webpages.
+ 2. Create a guestBook.html page.
+ 3. Handle comments and display them.
