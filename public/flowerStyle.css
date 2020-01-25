@@ -13,6 +13,7 @@ header {
 
 img {
   height: 100%;
+  width: 100%;
 }
 
 .container {
@@ -22,10 +23,10 @@ img {
 }
 
 .image {
-  flex: 30%;
+  flex: 50%;
 }
 
 .description {
-  flex: 80%;
+  flex: 60%;
   margin: auto;
 }
