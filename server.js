@@ -2,7 +2,10 @@ const { Server } = require('net');
 const fs = require('fs');
 const Request = require('./lib/request.js');
 const Response = require('./lib/response.js');
-const { formatComment, createTable, getResponseObject } = require('./lib/utilities');
+const {
+  formatComment,
+  createTable,
+  getResponseObject } = require('./lib/utilities');
 
 const STATIC_FOLDER = `${__dirname}/public`;
 const CONTENT_TYPES = {
@@ -35,7 +38,9 @@ const serveGuestBook = function (req) {
 const serveStaticFile = (req) => {
   const path = `${STATIC_FOLDER}${req.url}`;
   const stat = fs.existsSync(path) && fs.statSync(path);
-  if (!stat || !stat.isFile()) return new Response();
+  if (!stat || !stat.isFile()) {
+    return new Response();
+  }
   const [, extension] = path.match(/.*\.(.*)$/) || [];
   const contentType = CONTENT_TYPES[extension];
   const content = fs.readFileSync(path);
@@ -47,8 +52,12 @@ const findHandler = (req) => {
     req.url = '/index.html';
     return serveStaticFile;
   }
-  if (req.url === '/guestBook.html') return serveGuestBook;
-  if (req.method === 'GET') return serveStaticFile;
+  if (req.url === '/guestBook.html') {
+    return serveGuestBook;
+  }
+  if (req.method === 'GET') {
+    return serveStaticFile;
+  }
   return () => new Response();
 };
 
@@ -56,7 +65,9 @@ const handleConnection = function (socket) {
   const remote = `${socket.remoteAddress}:${socket.remotePort}`;
   console.warn('new connection', remote);
   socket.setEncoding('utf8');
-  socket.on('close', (hadError) => console.warn(`${remote} closed ${hadError ? 'with error' : ''}`));
+  socket.on('close', (hadError) => {
+    console.warn(`${remote} closed ${hadError ? 'with error' : ''}`);
+  });
   socket.on('end', () => console.warn(`${remote} ended`));
   socket.on('error', (err) => console.error('socket error', err));
   socket.on('data', (text) => {
@@ -70,10 +81,11 @@ const handleConnection = function (socket) {
 
 const main = () => {
   const server = new Server();
+  const port = 4000;
   server.on('error', err => console.error('server error', err));
   server.on('connection', handleConnection);
-  server.on('listening', () => console.warn('started listening', server.address()));
-  server.listen(4000);
-}
+  server.on('listening', () => console.warn('listening', server.address()));
+  server.listen(port);
+};
 
 main();
