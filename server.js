@@ -2,6 +2,7 @@ const { Server } = require('net');
 const fs = require('fs');
 const Request = require('./lib/request.js');
 const Response = require('./lib/response.js');
+const { formatComment, createTable, getResponseObject } = require('./lib/utilities');
 
 const STATIC_FOLDER = `${__dirname}/public`;
 const CONTENT_TYPES = {
@@ -10,7 +11,25 @@ const CONTENT_TYPES = {
   css: 'text/css',
   js: 'application/javascript',
   json: 'application/json',
-  gif: 'image/gif'
+  gif: 'image/gif',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  pdf: 'application/pdf'
+};
+
+const serveGuestBook = function (req) {
+  let comments = fs.readFileSync('./comments.json', 'utf8');
+  comments = JSON.parse(comments);
+  if (req.method === 'POST') {
+    const decodedComment = formatComment(req.body);
+    decodedComment.date = new Date().toJSON();
+    comments.unshift(decodedComment);
+    fs.writeFileSync('./comments.json', JSON.stringify(comments));
+  }
+  const commentsTable = createTable(comments);
+  let content = fs.readFileSync('./public/guestBook.html', 'utf8');
+  content = content.replace('__comments__', commentsTable);
+  return getResponseObject(content, 'text/html');
 };
 
 const serveStaticFile = (req) => {
@@ -20,12 +39,7 @@ const serveStaticFile = (req) => {
   const [, extension] = path.match(/.*\.(.*)$/) || [];
   const contentType = CONTENT_TYPES[extension];
   const content = fs.readFileSync(path);
-  const res = new Response();
-  res.setHeader('Content-Type', contentType);
-  res.setHeader('Content-Length', content.length);
-  res.statusCode = 200;
-  res.body = content;
-  return res;
+  return getResponseObject(content, contentType);
 };
 
 const findHandler = (req) => {
@@ -33,6 +47,7 @@ const findHandler = (req) => {
     req.url = '/index.html';
     return serveStaticFile;
   }
+  if (req.url === '/guestBook.html') return serveGuestBook;
   if (req.method === 'GET') return serveStaticFile;
   return () => new Response();
 };
@@ -51,7 +66,8 @@ const handleConnection = function (socket) {
     const res = handler(req);
     res.writeTo(socket);
   });
-}
+};
+
 const main = () => {
   const server = new Server();
   server.on('error', err => console.error('server error', err));
@@ -59,4 +75,5 @@ const main = () => {
   server.on('listening', () => console.warn('started listening', server.address()));
   server.listen(4000);
 }
+
 main();
