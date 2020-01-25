@@ -1,0 +1,5 @@
+Version 1.0:
+  1. Create repository.
+  2. Create the homepage.
+  3. Links to other pages on the home page.
+  4. Create other static pages.

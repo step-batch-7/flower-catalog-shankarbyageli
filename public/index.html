@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title> Flower Catalog Website </title>
+  <link rel="stylesheet" href="indexStyle.css">
+  <script>
+    const vanish = function () {
+      const flowerImage = document.querySelector('#gif');
+      flowerImage.style.visibility = 'hidden';
+      setTimeout(() => {
+        flowerImage.style.visibility = 'visible';
+      }, 1000);
+    };
+  </script>
+</head>
+
+<body>
+  <header> Flower Catalog </header>
+  <hr>
+  <div class="container">
+    <div class="image"> <img src="freshorigins.jpg" alt="Flower Image" id="flower-img"> </div>
+    <div class="text">
+      <ul>
+        <li> <a href="Abeliophyllum.html"> Abliophyllum </a> </li>
+        <li> <a href="Ageratum.html"> Ageratum </a> </li>
+      </ul>
+      <div>
+        <a href="guestBook.html"> Guest Book </a>
+        <img src="flower.gif" alt="flower animation" id="gif" onclick='vanish()'>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
