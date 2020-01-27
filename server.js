@@ -25,7 +25,8 @@ const serveGuestBook = function (req) {
   comments = JSON.parse(comments);
   if (req.method === 'POST') {
     const decodedComment = formatComment(req.body);
-    decodedComment.date = new Date().toLocaleString();
+    const date = new Date();
+    decodedComment.date = `${date.toDateString()} ${date.toLocaleTimeString()}`
     comments.unshift(decodedComment);
     fs.writeFileSync('./comments.json', JSON.stringify(comments));
   }
