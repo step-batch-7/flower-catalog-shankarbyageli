@@ -8,3 +8,6 @@ Version 2.0:
 --done-- 1. Create a server to host webpages.
 --done-- 2. Create a guestBook.html page.
 --done-- 3. Handle comments and display them.
+
+Version 3.0:
+--done--  1. Migrate from net module server to http server

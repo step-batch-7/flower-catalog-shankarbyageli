@@ -1,12 +1,11 @@
 const fs = require('fs');
-const Response = require('./lib/response.js');
 const {
   formatComment,
   createTable,
-  getResponseObject } = require('./lib/utilities');
-
+  parseQuery } = require('./lib/utilities');
 
 const STATIC_FOLDER = `${__dirname}/public`;
+const DATABASE = `${__dirname}/database/comments.json`;
 const CONTENT_TYPES = {
   txt: 'text/plain',
   html: 'text/html',
@@ -20,45 +19,73 @@ const CONTENT_TYPES = {
 };
 
 const serveGuestBook = function (req) {
-  let comments = fs.readFileSync('./database/comments.json', 'utf8');
+  const path = `${STATIC_FOLDER}${req.url}`;
+  let comments = fs.readFileSync(DATABASE, 'utf8');
   comments = JSON.parse(comments);
-  if (req.method === 'POST') {
-    const decodedComment = formatComment(req.body);
-    const date = new Date();
-    decodedComment.date = `${date.toDateString()} ${date.toLocaleTimeString()}`
-    comments.unshift(decodedComment);
-    fs.writeFileSync('./comments.json', JSON.stringify(comments));
-  }
   const commentsTable = createTable(comments);
-  let content = fs.readFileSync('./public/html/guestBook.html', 'utf8');
+  let content = fs.readFileSync(path, 'utf8');
   content = content.replace('__comments__', commentsTable);
-  return getResponseObject(content, 'text/html');
+  const contentType = 'text/html';
+  return { content, contentType };
+};
+
+const saveAndServeComments = function (req, data) {
+  let comments = fs.readFileSync(DATABASE, 'utf8');
+  comments = JSON.parse(comments);
+  const query = parseQuery(data);
+  const decodedComment = formatComment(query);
+  const date = new Date();
+  decodedComment.date = `${date.toDateString()} ${date.toLocaleTimeString()}`
+  comments.unshift(decodedComment);
+  fs.writeFileSync(DATABASE, JSON.stringify(comments));
+  return serveGuestBook(req);
 };
 
 const serveStaticFile = (req) => {
-  const path = `${STATIC_FOLDER}${req.url}`;
-  const stat = fs.existsSync(path) && fs.statSync(path);
-  if (!stat || !stat.isFile()) {
-    return new Response();
+  let path = req.url;
+  if (path === '/' || path === '/index.html') {
+    path = '/html/index.html';
   }
-  const [, extension] = path.match(/.*\.(.*)$/) || [];
+  const filePath = `${STATIC_FOLDER}${path}`;
+  const stat = fs.existsSync(filePath) && fs.statSync(filePath);
+  if (!stat || !stat.isFile()) {
+    return {};
+  }
+  const [, extension] = filePath.match(/.*\.(.*)$/) || [];
   const contentType = CONTENT_TYPES[extension];
-  const content = fs.readFileSync(path);
-  return getResponseObject(content, contentType);
+  const content = fs.readFileSync(filePath);
+  return { content, contentType };
+};
+
+const defaultResponse = () => {
+  return {};
+};
+
+const getHandlers = {
+  '/html/guestBook.html': serveGuestBook
+};
+
+const postHandlers = {
+  '/html/guestBook.html': saveAndServeComments
 };
 
 const findHandler = (req) => {
-  if (req.method === 'GET' && req.url === '/' || req.url === '/index.html') {
-    req.url = '/html/index.html';
-    return serveStaticFile;
-  }
-  if (req.url === '/html/guestBook.html') {
-    return serveGuestBook;
-  }
   if (req.method === 'GET') {
-    return serveStaticFile;
+    return getHandlers[req.url] || serveStaticFile;
   }
-  return () => new Response();
+  if (req.method === 'POST') {
+    return postHandlers[req.url];
+  }
+  return defaultResponse;
 };
 
-module.exports = { findHandler };
+const getResponse = function (req, data) {
+  const handler = findHandler(req);
+  let status = 200;
+  let { content, contentType } = handler(req, data);
+  if (content === undefined) status = 404;
+  const headers = { 'Content-Type': contentType };
+  return { status, content, headers };
+};
+
+module.exports = { getResponse };
