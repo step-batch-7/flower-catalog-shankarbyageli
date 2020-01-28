@@ -6,15 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title> Flower Catalog Website </title>
   <link rel="stylesheet" href="css/indexStyle.css">
-  <script>
-    const vanish = function () {
-      const flowerImage = document.querySelector('#gif');
-      flowerImage.style.visibility = 'hidden';
-      setTimeout(() => {
-        flowerImage.style.visibility = 'visible';
-      }, 1000);
-    };
-  </script>
+  <script src='js/script.js'> </script>
 </head>
 
 <body>
@@ -29,7 +21,7 @@
       </ul>
       <div>
         <a href="html/guestBook.html"> Guest Book </a>
-        <img src="resources/flower.gif" alt="flower animation" id="gif" onclick='vanish()'>
+        <img src="resources/flower.gif" alt="flower animation" id="gif" onclick='vanishJar()'>
       </div>
     </div>
   </div>

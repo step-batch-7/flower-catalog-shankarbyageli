@@ -84,7 +84,7 @@ const getResponse = function (req, data) {
   let status = 200;
   let { content, contentType } = handler(req, data);
   if (content === undefined) status = 404;
-  const headers = { 'Content-Type': contentType };
+  const headers = { 'Content-Type': contentType || 'text/html' };
   return { status, content, headers };
 };
 
