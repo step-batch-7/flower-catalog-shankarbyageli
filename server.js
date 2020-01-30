@@ -1,5 +1,5 @@
 const http = require('http');
-const app = require('./handlers');
+const app = require('./lib/handlers');
 
 const main = () => {
   const port = 4000;
