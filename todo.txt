@@ -11,3 +11,4 @@ Version 2.0:
 
 Version 3.0:
 --done--  1. Migrate from net module server to http server
+--done--  2. Adding tests for GET and POST requests
