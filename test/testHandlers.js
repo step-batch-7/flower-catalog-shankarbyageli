@@ -1,3 +1,4 @@
+const fs = require('fs');
 const request = require('supertest');
 const app = require('../lib/handlers.js');
 const { STATUS_CODES } = require('../lib/utilities.js');
@@ -47,6 +48,9 @@ describe('POST comments', function () {
       .send('username=sharad&comment=nice bro')
       .expect(STATUS_CODES.redirect, done);
   });
+  after(() => {
+    fs.truncateSync(process.env.DATA_STORE);
+  })
 });
 
 describe('GET comments', function () {
