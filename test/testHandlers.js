@@ -1,5 +1,6 @@
 const request = require('supertest');
 const app = require('../lib/handlers.js');
+const { STATUS_CODES } = require('../lib/utilities.js');
 
 describe('GET /', function () {
   it('responds with homePage', function (done) {
@@ -7,7 +8,7 @@ describe('GET /', function () {
       .get('/')
       .set('Accept', 'text/html')
       .expect(/Flower Catalog/)
-      .expect(200, done);
+      .expect(STATUS_CODES.success, done);
   });
 });
 
@@ -17,7 +18,7 @@ describe('GET /staticPage', function () {
       .get('/html/Ageratum.html')
       .set('Accept', 'text/html')
       .expect(/Ageratum/)
-      .expect(200, done);
+      .expect(STATUS_CODES.success, done);
   });
 });
 
@@ -26,7 +27,7 @@ describe('GET /badRequest', function () {
     request(app.serve.bind(app))
       .get('/badRequest')
       .expect('Not Found')
-      .expect(404, done);
+      .expect(STATUS_CODES.notFound, done);
   });
 });
 
@@ -35,7 +36,7 @@ describe('PUT /url', function () {
     request(app.serve.bind(app))
       .put('/html/Ageratum.html')
       .expect(/not allowed/i)
-      .expect(400, done);
+      .expect(STATUS_CODES.notAllowed, done);
   });
 });
 
@@ -44,7 +45,7 @@ describe('POST comments', function () {
     request(app.serve.bind(app))
       .post('/html/guestBook.html')
       .send('username=sharad&comment=nice bro')
-      .expect(301, done);
+      .expect(STATUS_CODES.redirect, done);
   });
 });
 
@@ -53,6 +54,6 @@ describe('GET comments', function () {
     request(app.serve.bind(app))
       .get('/html/guestBook.html')
       .set('Accept', 'text/html')
-      .expect(200, done);
+      .expect(STATUS_CODES.success, done);
   });
 });
